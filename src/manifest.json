@@ -13,11 +13,12 @@
   },
   "permissions": [
     "*://*.bilibili.com/*",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "content_scripts": [{
       "matches": ["*://www.bilibili.com/*"],
-      "js": ["javascript/background.js"],
+      "js": ["javascript/content.js"],
       "run_at": "document_end"
   }]
 }
