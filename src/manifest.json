@@ -14,11 +14,17 @@
   "permissions": [
     "*://*.bilibili.com/*",
     "tabs",
-    "storage"
+    "storage",
+    "cookies",
+    "sessions"
   ],
   "content_scripts": [{
-      "matches": ["*://www.bilibili.com/*"],
+      "all_frames": true,
+      "matches": ["*://*.bilibili.com/*"],
       "js": ["javascript/content.js"],
       "run_at": "document_end"
-  }]
+  }],
+  "background": {
+    "page": "background.html"
+  }
 }

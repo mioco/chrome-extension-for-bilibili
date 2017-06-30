@@ -10,6 +10,7 @@ class Preference {
         resolve(val)
       })
     })
+    
     this.setState = new Proxy(this, {
       get: (target, name) => name in target ? target[name] : false
     })
@@ -24,16 +25,22 @@ class Preference {
 
 window.addEventListener("load", () => {
   let preference       = new Preference(),
-      reg              = new RegExp('www.bilibili.com/video|anime/*'),
-      url              = location.host + location.pathname,
+      reg              = new RegExp('http|https://www|bangumi.bilibili.com/video|anime/*'),
+      url              = location.href,
       MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver
   
   if (reg.test(url)) {
-    let childNodes  = document
+    
+    let iframe = document.querySelector('iframe'),
+        // if there is an iframe which contain video in anime page
+        _document = iframe ? iframe.contentWindow.document : document,
+        // control button list
+        childNodes  = _document
                       .querySelector('.bilibili-player-video-control')
                       .querySelectorAll('.bilibili-player-video-btn'),
         classProfix = 'bilibili-player-video-btn-',
-        video       = document.querySelector('.bilibili-player-video'),
+        video       = _document.querySelector('.bilibili-player-video'),
+        // observer for video
         config      = { childList: true },
         observer;
 
@@ -43,6 +50,7 @@ window.addEventListener("load", () => {
 
         video.addEventListener('loadeddata', () => {
           let eles = []
+
           Array.from(childNodes).forEach((ele, index) => {
             let eleItem  = ele.classList[1],
                 eleClass = eleItem.replace(classProfix, ''),
@@ -62,16 +70,16 @@ window.addEventListener("load", () => {
 
           Promise.all(actions).then(() => {
             if (state[PROFIX + 'start']) {
-              let startBtn = document.querySelector(`.${classProfix}start`)
+              let startBtn = _document.querySelector(`.${classProfix}start`)
               if (startBtn.classList.contains('video-state-pause')) {
-                setTimeout(video.play(), 500)
+                setTimeout(video.play(), 1000)
               }
             }
           })
         })// end of loadeddata
       }
 
-      // video is loaded
+      // if video be loaded
       if (video.childNodes[0]) init()
       else {
         observer = new MutationObserver(mutations => {
@@ -87,3 +95,9 @@ window.addEventListener("load", () => {
     })
   }
 });
+
+fetch('http://space.bilibili.com/ajax/member/MyInfo', {
+      'credentials': 'include'
+    }).then(res => {
+      return res.json()
+    }).then(data => console.log(data))
