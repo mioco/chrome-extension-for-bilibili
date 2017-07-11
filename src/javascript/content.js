@@ -31,9 +31,9 @@ window.addEventListener("load", () => {
   
   if (reg.test(url)) {
     
-    let iframe = document.querySelector('iframe'),
+    let video_control = document.querySelector('.bilibili-player-video-control'),
         // if there is an iframe which contain video in anime page
-        _document = iframe ? iframe.contentWindow.document : document,
+        _document = video_control ? document : document.querySelector('iframe').contentWindow.document,
         // control button list
         childNodes  = _document
                       .querySelector('.bilibili-player-video-control')
@@ -95,9 +95,3 @@ window.addEventListener("load", () => {
     })
   }
 });
-
-fetch('http://space.bilibili.com/ajax/member/MyInfo', {
-      'credentials': 'include'
-    }).then(res => {
-      return res.json()
-    }).then(data => console.log(data))
