@@ -4,6 +4,8 @@ class BilibiliPlugin {
   constructor () {
     this.PROFIX = 'bilibili-plugin-'
     this.cookie = {}
+    this.islogin = false
+
     // get localStorage and then sync execute init()
     this.getStorage = new Promise(resolve => {
       chrome.storage.sync.get(null, val => {
@@ -11,6 +13,7 @@ class BilibiliPlugin {
       })
     })
 
+    // preferences information in this.state
     this.setState = new Proxy(this, {
       // save to localstorage when set state
       set: (target, prop, value) => {
@@ -30,37 +33,67 @@ class BilibiliPlugin {
   }
 
   init (state) {
-    // sync config to popup
+    // sync config to popup.html
     this.state = state
-    Array.from($.getAll('.bp-prefrence-checkbox')).forEach(ele => {
+    Array.from($.getAll('.bp-preference-checkbox')).forEach(ele => {
       ele.addEventListener('change', e => {
         this.setState[ele.name] = Number(e.target.checked)
       })
       ele.checked = this.setState[ele.name]
     })
-    if (this.checkLogin()) {
-      const userApi = 'http://space.bilibili.com/ajax/member/MyInfo',
-            vedioApi = 'http://data.bilibili.com/v/web/web_feed';
 
-      // get user info
-      this.bg.fetchData(userApi, data => {
+    // get user info
+    const userApi = 'http://space.bilibili.com/ajax/member/MyInfo';
+    this.bg.fetchData(userApi, data => {
+      if (!data.status) {
+        this.islogin = false;
+        $('.bp-login-btn').onclick = this.login;
+        $('.bp-notLogin').removeClass('hidden').addEventListener('click', () => this.login());
+        $('.bp-profile').addClass('hidden');
+        return false;
+      } else {
         let {coins, face, level_info, mid, s_face, uname} = data['data'];
         this.userInfo = {coins, face, level_info, mid, s_face, uname};
+        this.islogin = true;
 
+        $('.bp-notLogin').addClass('hidden');
+        $('.bp-profile').removeClass('hidden');
         // insert userinfo into element
         let avatar = $('.bp-profile-avatar')
         avatar.$('img').src = face;
         avatar.$('span').textContent = uname;
+      }
+    })
+
+    if (this.islogin) {
+      // get video
+      const vedioApi = 'http://data.bilibili.com/v/web/web_feed';
+      let vedioApiParam = {
+        mid: this.cookie.DedeUserID,
+        fts: this.cookie.fts,
+        url: 'http%3A%2F%2Fwww.bilibili.com%2Faccount%2Fdynamic',
+        proid: 1,
+        ptype: 1,
+        optype: 1,
+        tag_content: '',
+        tab_type: '',
+        tab_content: '',
+        _: Date.parse(new Date())
+      }
+
+      document.addEventListener('click', e => {
+        if (e.target.className === 'bp-tag') {
+          vedioApiParam['clickid'] = e.target.getAttribute("name");
+          this.bg.fetchData(vedioApi, data => {
+            console.log(data)
+          }, vedioApiParam, false);
+        }
       })
     }
   }
 
-  checkLogin () {
-    this.bg.getCookie().split(';').forEach(item => {
-      let tempArr = item.split('=');
-      this.cookie[tempArr[0].trim()] = tempArr[1];
-    })
-    return true
+  login (user, password) {
+    openUrl('https://passport.bilibili.com/login')
   }
 
   refresh () {
@@ -68,11 +101,16 @@ class BilibiliPlugin {
   }
 }
 
-window.$ = Element.prototype.$ = function (ele) {
-  return document.querySelector(ele);
+window.$ = Element.prototype.$ = ele => document.querySelector(ele);
+$.getAll = ele => document.querySelectorAll(ele);
+
+Element.prototype.addClass = function (className) {
+  this.classList.add(className);
+  return this;
 }
-$.getAll = ele => {
-  return document.querySelectorAll(ele);
+Element.prototype.removeClass = function (className) {
+  this.classList.remove(className);
+  return this;
 }
 
 let start = new BilibiliPlugin()

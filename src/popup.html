@@ -13,6 +13,9 @@
     input {
       outline: none;
     }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -30,12 +33,15 @@
         </ul>
       </div>
     </div>
+    <div class="bp-notLogin">
+      <div class="bp-btn bp-login-btn">登录/注册</div>
+    </div>
     <hr />
-    <div class="bp-prefrence">
+    <div class="bp-preference">
       <p>偏好设置</p>
-      <input type="checkbox" class="bp-prefrence-checkbox" name="widescreen">宽屏记忆
-      <input type="checkbox" class="bp-prefrence-checkbox" name="danmaku">关闭弹幕
-      <input type="checkbox" class="bp-prefrence-checkbox" name="start">自动开始
+      <input type="checkbox" class="bp-preference-checkbox" name="widescreen">宽屏记忆
+      <input type="checkbox" class="bp-preference-checkbox" name="danmaku">关闭弹幕
+      <input type="checkbox" class="bp-preference-checkbox" name="start">自动开始
       <br />
     </div>
     <hr />
@@ -70,6 +76,7 @@
       </div>
     </li>
   </template>
-  <script src="javascript/BilibiliPlugin.js"></script>
+  <script src="javascript/common.js" type="text/javascript"></script>
+  <script src="javascript/BilibiliPlugin.js" type="text/javascript"></script>
 </body>
 </html>
