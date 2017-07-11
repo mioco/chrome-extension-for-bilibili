@@ -10,17 +10,20 @@ chrome.cookies.getAll({
   let api   = 'http://api.bilibili.com/x/web-feed/feed',
       param = {}
       
-  chrome.browserAction.setBadgeText({text:"?"});
+  chrome.browserAction.setBadgeText({text:"10"});
 })
 
-window.fetchData = (api, callback) => {
-  let dataObj
+window.fetchData = (api, callback, param) => {
+  let newApi = !param ? api : api + '?' + Object.keys(param).reduce((result, key) => {
+    return result += `${result ? '&' : ''}${key}=${param[key]}` 
+  }, '');
   if (window.fetch) {
-    fetch(api, {
-      'credentials': 'include'
+    fetch(newApi, {
+      'credentials': 'include',
+      'Origin': 'http://www.bilibili.com'
     })
     .then(res => res.json())
-    .then(data => callback(data))
+    .then(data => callback ? callback(data) : data)
   }
 }
 

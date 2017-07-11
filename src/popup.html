@@ -20,6 +20,7 @@
     <div class="bp-profile">
       <div class="bp-profile-avatar">
         <img src="" alt="">
+        <span></span>
       </div>
       <div class="bp-profile-info">
         <ul>
@@ -30,7 +31,7 @@
       </div>
     </div>
     <hr />
-    <div class="prefrence">
+    <div class="bp-prefrence">
       <p>偏好设置</p>
       <input type="checkbox" class="bp-prefrence-checkbox" name="widescreen">宽屏记忆
       <input type="checkbox" class="bp-prefrence-checkbox" name="danmaku">关闭弹幕
@@ -41,13 +42,10 @@
     <div class="">
       <nav>
         <ul>
-          <li id="video">视频
+          <li class="bp-tag" name="7" id="video">视频
             <div class="num"></div>
           </li>
-          <li id="anime">番剧
-            <div class="num"></div>
-          </li>
-          <li id="live">直播
+          <li class="bp-tag" name="9" id="anime">番剧
             <div class="num"></div>
           </li>
         </ul>
@@ -60,6 +58,18 @@
     </div>
   </div>
 
+  <template>
+    <li>
+      <div class="preview"><img src="" alt=""></div>
+      <div class="r">
+        <div class="title">
+          <span class="up"></span>
+          <span>投稿了</span>
+        </div>
+        <div class="info"></div>
+      </div>
+    </li>
+  </template>
   <script src="javascript/BilibiliPlugin.js"></script>
 </body>
 </html>

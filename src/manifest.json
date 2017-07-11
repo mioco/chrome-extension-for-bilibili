@@ -16,7 +16,8 @@
     "tabs",
     "storage",
     "cookies",
-    "sessions"
+    "sessions",
+    "webRequest"
   ],
   "content_scripts": [{
       "all_frames": true,
