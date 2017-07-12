@@ -47,8 +47,7 @@ class BilibiliPlugin {
     this.bg.fetchData(userApi, data => {
       if (!data.status) {
         this.islogin = false;
-        $('.bp-login-btn').onclick = this.login;
-        $('.bp-notLogin').removeClass('hidden').addEventListener('click', () => this.login());
+        $('.bp-notLogin').removeClass('hidden').addEventListener('click', this.login);
         $('.bp-profile').addClass('hidden');
         return false;
       } else {
@@ -92,8 +91,8 @@ class BilibiliPlugin {
     }
   }
 
-  login (user, password) {
-    openUrl('https://passport.bilibili.com/login')
+  login () {
+    chrome.tabs.create({url: "https://passport.bilibili.com/login"});
   }
 
   refresh () {
