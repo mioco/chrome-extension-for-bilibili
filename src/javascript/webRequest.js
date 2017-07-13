@@ -7,9 +7,13 @@
 class WebRequest {
   constructor (config) {
     this.urls = ['*://*.bilibili.com/*'];
+    this.config = Object.assign({
+      Origin: 'https://www.bilibili.com'
+    }, config)
+    
     this.requestRules = {
       'Origin': {
-        'value': config.Origin || 'https://www.bilibili.com',
+        'value': this.config.Origin,
         'mandatory': true
       }
     }
@@ -55,11 +59,9 @@ class WebRequest {
 
       if(JSON.stringify(rules).length > 2) {
         Object.keys(rules).forEach(key => {
-          console.log(rules[key].value)
           details[headers].push({ name: key, value: rules[key]['value']})
         })
       }
-      console.log({[headers]: details[headers]})
       return {[headers]: details[headers]};
     }
   }

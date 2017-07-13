@@ -2,9 +2,11 @@
 
 class BilibiliPlugin {
   constructor () {
+    this.data = chrome.extension.getBackgroundPage().data
     this.PROFIX = 'bilibili-plugin-'
     this.cookie = {}
-    this.islogin = false
+    this.islogin = this.data.userInfo.status
+    console.log(this.islogin)
 
     // get localStorage and then sync execute init()
     this.getStorage = new Promise(resolve => {
@@ -29,7 +31,6 @@ class BilibiliPlugin {
       get: (target, prop) => Boolean(Number(this.state[this.PROFIX + prop]))
     })
 
-    this.bg = chrome.extension.getBackgroundPage()
   }
 
   init (state) {
@@ -43,49 +44,64 @@ class BilibiliPlugin {
     })
 
     // get user info
-    const userApi = 'http://space.bilibili.com/ajax/member/MyInfo';
-    this.bg.fetchData(userApi, data => {
-      if (!data.status) {
-        this.islogin = false;
-        $('.bp-notLogin').removeClass('hidden').addEventListener('click', this.login);
-        $('.bp-profile').addClass('hidden');
-        return false;
-      } else {
-        let {coins, face, level_info, mid, s_face, uname} = data['data'];
-        this.userInfo = {coins, face, level_info, mid, s_face, uname};
-        this.islogin = true;
+    if (!this.islogin) {
+      $('.bp-notLogin').removeClass('hidden').addEventListener('click', this.login);
+      $('.bp-profile').addClass('hidden');
+      return false;
+    } else {
+      let {coins, face, level_info, mid, s_face, uname} = this.data.userInfo['data'];
+      this.userInfo = {coins, face, level_info, mid, s_face, uname};
 
-        $('.bp-notLogin').addClass('hidden');
-        $('.bp-profile').removeClass('hidden');
-        // insert userinfo into element
-        let avatar = $('.bp-profile-avatar')
-        avatar.$('img').src = face;
-        avatar.$('span').textContent = uname;
+      $('.bp-notLogin').addClass('hidden');
+      $('.bp-profile').removeClass('hidden');
+      
+      // insert userinfo into element
+      let avatar = $('.bp-profile-avatar')
+      avatar.$('img').src = face;
+      avatar.$('span').textContent = uname;
+
+      // inser video list
+      let videoWrap = $('.list_wrap');
+      let initWrap = document.createDocumentFragment();
+
+      if ('content' in document.createElement('template')) {
+        let template = $('#bp-videoList').content;
+        let templateLi = template.querySelector('li').children;
+
+        this.data.videoList.forEach(item => {
+          let {aid, ctime, desc, owner, pic, pubdate, stat, state, title, tname} = item.archive;
+          
+          templateLi[0].querySelector('img').src = pic;
+          let up = templateLi[1].querySelector('a.bp-videoList-up');
+          up.textContent = owner.name;
+          up.href = `//space.bilibili.com/${owner.mid}`;
+
+          let info = templateLi[1].querySelector('.bp-videoList-info a');
+          info.textContent = desc;
+          info.href = `//www.bilibili.com/video/av${aid}`;
+          
+          initWrap.appendChild(document.importNode(template, true))
+        })
+
+        videoWrap.appendChild(initWrap);
       }
-    })
+      
+    }
 
     if (this.islogin) {
       // get video
-      const vedioApi = 'http://data.bilibili.com/v/web/web_feed';
-      let vedioApiParam = {
-        mid: this.cookie.DedeUserID,
-        fts: this.cookie.fts,
-        url: 'http%3A%2F%2Fwww.bilibili.com%2Faccount%2Fdynamic',
-        proid: 1,
-        ptype: 1,
-        optype: 1,
-        tag_content: '',
-        tab_type: '',
-        tab_content: '',
+      const videoApi = 'http://api.bilibili.com/x/web-feed/feed';
+      let videoApiParam = {
+        ps: 10,
+        type: 0,
         _: Date.parse(new Date())
       }
 
       document.addEventListener('click', e => {
         if (e.target.className === 'bp-tag') {
-          vedioApiParam['clickid'] = e.target.getAttribute("name");
-          this.bg.fetchData(vedioApi, data => {
-            console.log(data)
-          }, vedioApiParam, false);
+          videoApiParam['clickid'] = e.target.getAttribute("name");
+          this.bg.fetchData(videoApi, data => {
+          }, videoApiParam, false);
         }
       })
     }
@@ -100,7 +116,7 @@ class BilibiliPlugin {
   }
 }
 
-window.$ = Element.prototype.$ = ele => document.querySelector(ele);
+window.$ = HTMLCollection.prototype.$ = Element.prototype.$ = ele => document.querySelector(ele);
 $.getAll = ele => document.querySelectorAll(ele);
 
 Element.prototype.addClass = function (className) {
