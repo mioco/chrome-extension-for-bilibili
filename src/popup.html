@@ -5,47 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Bilibili plug-in</title>
-  <style>
-    .container {
-      width: 30em;
-      height: 10em;
-    }
-    input {
-      outline: none;
-    }
-    .hidden {
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
   <div class="container">
-    <div class="bp-profile hidden">
-      <div class="bp-profile-avatar">
-        <img src="" alt="">
-        <span></span>
+    <div class="bp-top">
+      <div class="bp-profile hidden">
+        <div class="bp-profile-header">
+          <div class="bp-profile-avatar"><img src="" alt=""></div>
+        </div>
+        <div class="bp-profile-info">
+          <div>
+            <span id="bp-profile-info-name"></span>
+            <i></i><span id="bp-profile-info-coins"></span>
+          </div>
+          <div>
+            <i></i>
+            <div id="bp-profile-info-levelbar">
+              <div></div>
+            </div>
+            <small></small>
+          </div>
+        </div>
       </div>
-      <div class="bp-profile-info">
-        <ul>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
+      <div class="bp-notLogin">
+        <div class="bp-btn bp-login-btn">登录/注册</div>
       </div>
-    </div>
-    <div class="bp-notLogin">
-      <div class="bp-btn bp-login-btn">登录/注册</div>
+      <div class="bp-preference phidden">
+        <hr id="bp-top-division"/>
+        <div class="bp-preference-body">
+          <p>偏好设置</p>
+          <input type="checkbox" class="bp-preference-checkbox" name="widescreen">宽屏记忆
+          <input type="checkbox" class="bp-preference-checkbox" name="danmaku">关闭弹幕
+          <input type="checkbox" class="bp-preference-checkbox" name="start">自动开始
+        </div>
+      </div>
     </div>
     <hr />
-    <div class="bp-preference">
-      <p>偏好设置</p>
-      <input type="checkbox" class="bp-preference-checkbox" name="widescreen">宽屏记忆
-      <input type="checkbox" class="bp-preference-checkbox" name="danmaku">关闭弹幕
-      <input type="checkbox" class="bp-preference-checkbox" name="start">自动开始
-      <br />
-    </div>
-    <hr />
-    <div class="">
+    <div class="bp-bottom">
       <nav>
         <ul>
           <li class="bp-tag" name="7" id="video">视频
@@ -58,8 +55,8 @@
       </nav>
       <div class="list_wrap">
         <div data-for="video"></div>
-        <div data-for="anime"></div>
-        <div data-for="live"></div>
+        <div data-for="bangumi"></div>
+        <div class="loading">loding...</div>
       </div>
     </div>
   </div>

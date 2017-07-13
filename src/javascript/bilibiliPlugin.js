@@ -6,7 +6,6 @@ class BilibiliPlugin {
     this.PROFIX = 'bilibili-plugin-'
     this.cookie = {}
     this.islogin = this.data.userInfo.status
-    console.log(this.islogin)
 
     // get localStorage and then sync execute init()
     this.getStorage = new Promise(resolve => {
@@ -34,6 +33,7 @@ class BilibiliPlugin {
   }
 
   init (state) {
+    this.data.getData();
     // sync config to popup.html
     this.state = state
     Array.from($.getAll('.bp-preference-checkbox')).forEach(ele => {
@@ -43,6 +43,12 @@ class BilibiliPlugin {
       ele.checked = this.setState[ele.name]
     })
 
+    $('#bp-top-division').addEventListener('click', this.preferenceView);
+    document.addEventListener('mousewheel', e => {
+      if (e.deltaY > 0) {
+        // get more data
+      }
+    })
     // get user info
     if (!this.islogin) {
       $('.bp-notLogin').removeClass('hidden').addEventListener('click', this.login);
@@ -56,36 +62,46 @@ class BilibiliPlugin {
       $('.bp-profile').removeClass('hidden');
       
       // insert userinfo into element
-      let avatar = $('.bp-profile-avatar')
-      avatar.$('img').src = face;
-      avatar.$('span').textContent = uname;
-
+      $('.bp-profile-avatar').$('img').src = face;
+      let info = $('.bp-profile-info').children;
+      info[0].$('#bp-profile-info-name').textContent = uname;
+      info[0].$('#bp-profile-info-coins').textContent = coins;
+      info[1].querySelector('i').textContent = level_info.current_level;
+      info[1].querySelector('#bp-profile-info-levelbar div').style.width = (level_info.current_exp / level_info.next_exp) * 100 + '%';
+      info[1].querySelector('small').textContent = `${level_info.current_exp}/${level_info.next_exp}`
+      
       // inser video list
       let videoWrap = $('.list_wrap');
       let initWrap = document.createDocumentFragment();
 
-      if ('content' in document.createElement('template')) {
-        let template = $('#bp-videoList').content;
-        let templateLi = template.querySelector('li').children;
-
-        this.data.videoList.forEach(item => {
-          let {aid, ctime, desc, owner, pic, pubdate, stat, state, title, tname} = item.archive;
+      // 
+      setTimeout(() => {
+        if ('content' in document.createElement('template')) {
+          let template = $('#bp-videoList').content;
+          let templateLi = template.querySelector('li').children;
           
-          templateLi[0].querySelector('img').src = pic;
-          let up = templateLi[1].querySelector('a.bp-videoList-up');
-          up.textContent = owner.name;
-          up.href = `//space.bilibili.com/${owner.mid}`;
+          this.data.videoList.forEach((item, index) => {
+            if (index < 5) {
+              let {aid, ctime, desc, owner, pic, pubdate, stat, state, title, tname} = item.archive;
+              
+              templateLi[0].querySelector('img').src = pic;
+              let up = templateLi[1].querySelector('a.bp-videoList-up');
+              up.textContent = owner.name;
+              up.href = `//space.bilibili.com/${owner.mid}`;
 
-          let info = templateLi[1].querySelector('.bp-videoList-info a');
-          info.textContent = desc;
-          info.href = `//www.bilibili.com/video/av${aid}`;
-          
-          initWrap.appendChild(document.importNode(template, true))
-        })
+              let info = templateLi[1].querySelector('.bp-videoList-info a');
+              info.textContent = title.slice(0, 20) + '...';
+              info.title = title;
+              info.href = `//www.bilibili.com/video/av${aid}`;
+              
+              initWrap.appendChild(document.importNode(template, true))
+            }
+          })
 
-        videoWrap.appendChild(initWrap);
-      }
-      
+          $('.loading').addClass('hidden');
+          videoWrap.appendChild(initWrap);
+        }
+      }, 100);
     }
 
     if (this.islogin) {
@@ -113,6 +129,10 @@ class BilibiliPlugin {
 
   refresh () {
     let fragment = new DocumentFragment()
+  }
+
+  preferenceView () {
+    $('.bp-preference').classList.toggle('phidden');
   }
 }
 

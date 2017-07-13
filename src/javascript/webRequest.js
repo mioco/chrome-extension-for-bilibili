@@ -42,9 +42,9 @@ class WebRequest {
       urls: this.urls
     }, ['blocking', 'responseHeaders']);
 
-    chrome.webRequest.onBeforeSendHeaders.addListener(this.listener(this.requestRules, 'requestHeaders'), {
-      urls: this.urls
-    }, ['blocking', 'requestHeaders']);
+    // chrome.webRequest.onBeforeSendHeaders.addListener(this.listener(this.requestRules, 'requestHeaders'), {
+    //   urls: this.urls
+    // }, ['blocking', 'requestHeaders']);
   }
 
   listener (rules, headers) {
